@@ -2,17 +2,18 @@
 
 [![Build Status](https://travis-ci.org/vmware/column.svg?branch=master)](https://travis-ci.org/vmware/column)
 [![codecov](https://codecov.io/gh/vmware/column/branch/master/graph/badge.svg)](https://codecov.io/gh/vmware/column)
-[![Latest Version](https://img.shields.io/pypi/v/column.svg)](https://pypi.python.org/pypi/column/)
-[![Python Versions](https://img.shields.io/pypi/pyversions/column.svg)](https://pypi.python.org/pypi/column/)
-[![Format](https://img.shields.io/pypi/format/column.svg)](https://pypi.python.org/pypi/column/)
+[![Latest Version](https://img.shields.io/pypi/v/column.svg)](https://pypi.org/project/column/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/column.svg)](https://pypi.org/project/column/)
+[![Format](https://img.shields.io/pypi/format/column.svg)](https://pypi.org/project/column/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/vmware/column/blob/master/LICENSE)
+[![Slack](https://img.shields.io/badge/slack-join%20chat%20%E2%86%92-e01563.svg)](https://code.vmware.com/web/code/join)
 
 ## Overview
 Column is a thin wrapper on top of the Ansible API to serve
-as an entry point for other code when Ansible is needed. Because Ansible
-internal API is not officially exposed and thus changes frequently,
-this wrapper can be used instead of touching Ansible directly so that
-any further Ansible API changes will only incur change in this module.
+as an entry point for other code when Ansible is needed. Because the Ansible
+internal API is not officially exposed and changes frequently, this wrapper
+can be used instead of touching Ansible directly so that any further Ansible
+API changes will only incur change in this module.
 
 This module exposes two classes:
 column.APIRunner and column.SubprocessRunner

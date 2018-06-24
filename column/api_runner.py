@@ -1,10 +1,13 @@
 # Copyright (c) 2017 VMware, Inc. All Rights Reserved.
 # SPDX-License-Identifier: GPL-3.0
 
+import json
 import logging
 import os
+import six
 
 from ansible import constants
+from ansible import errors
 from ansible.executor import playbook_executor
 from ansible.executor import task_queue_manager
 from ansible import inventory
@@ -33,7 +36,7 @@ class ErrorsCallback(callback.AnsibleCallback):
 
     def run_on_runner_failed(self, result, ignore_errors=False):
         if ignore_errors:
-            #  We only collect not ignored errors
+            # We only collect non-ignored errors
             return
         self.failed_results.append(result)
 
@@ -79,7 +82,11 @@ class APIRunner(runner.Runner):
 
         variable_manager = vars.VariableManager()
         loader = dataloader.DataLoader()
-        variable_manager.extra_vars = options.extra_vars
+        if six.PY2:
+            variable_manager.extra_vars = json.loads(
+                json.dumps(options.extra_vars))
+        else:
+            variable_manager.extra_vars = options.extra_vars
 
         ansible_inv = inventory.Inventory(loader=loader,
                                           variable_manager=variable_manager,
@@ -98,11 +105,13 @@ class APIRunner(runner.Runner):
         self.tqm = pbex._tqm
         errors_callback = ErrorsCallback()
         self.add_callback(errors_callback)
-        # There is no public API for adding callbacks, hence we use private
+        # There is no public API for adding callbacks, hence we use a private
         # property to add callbacks
         pbex._tqm._callback_plugins.extend(self._callbacks)
-
-        status = pbex.run()
+        try:
+            pbex.run()
+        except errors.AnsibleParserError as e:
+            raise exceptions.ParsePlaybookError(msg=str(e))
         stats = pbex._tqm._stats
         failed_results = errors_callback.failed_results
         result = self._process_stats(stats, failed_results)
@@ -153,8 +162,8 @@ class APIRunner(runner.Runner):
                 run_additional_callbacks=True
             )
 
-            # There is no public API for adding callbacks, hence we use private
-            # property to add callbacks
+            # There is no public API for adding callbacks, hence we use a
+            # private property to add callbacks
             tqm._callback_plugins.extend(self._callbacks)
 
             result = tqm.run(play_obj)
